@@ -25,10 +25,7 @@ void main() {
     }
 
     // TODO: compute light space position and gl_Position
-    vec3 fragPos = vec3(uModel * vec4(position, 1.0));
-    lightSpaceMatrix = uLightProjection * uLightView;
-
-    vLightSpacePos = lightSpaceMatrix * vec4(fragPos, 1.0);
-    gl_Position = uProjection * uView * vec4(fragPos, 1.0);
+    vLightSpacePos = uLightProjection * uLightView * uModel * vec4(position, 1.0);
+    gl_Position = uProjection * uView * uModel * vec4(position, 1.0);
 }
 `;
