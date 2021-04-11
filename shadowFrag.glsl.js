@@ -11,6 +11,12 @@ vec3 shadowCalculation(vec4 lightSpacePos) {
     // TODO: shadow calculation
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
 
+    projCoords = projCoords * 0.05 + 0.05;
+    
+    //find out what shadowMap is
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
     return projCoords;
 }
 
