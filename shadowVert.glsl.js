@@ -29,6 +29,6 @@ void main() {
     lightSpaceMatrix = uLightProjection * uLightView;
 
     vLightSpacePos = lightSpaceMatrix * vec4(fragPos, 1.0);
-    gl_Position = uProjection * uView * vec4(fragPos, 1.0);
+    gl_Position = uProjection * uView * uModel * vec4(fragPos, 1.0);
 }
 `;

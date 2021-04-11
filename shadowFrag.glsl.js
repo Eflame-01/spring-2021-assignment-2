@@ -9,10 +9,17 @@ out vec4 outColor;
 
 vec3 shadowCalculation(vec4 lightSpacePos) {
     // TODO: shadow calculation
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+
+    return projCoords;
 }
 
 void main() {
-    // TODO: compute shadowmap coordenates 
+    // TODO: compute shadowmap coordenates
+    vec3 vTexCoord = shadowCalculation(vLightSpacePos);
+
     // TODO: evaluate if point is in shadow or not
+    outColor = texture(uSampler, vTexCoord);
+    gl_FragColor = vec4(outColor.rgb * vLightSpacePos, outColor.a);
 }
 `;
