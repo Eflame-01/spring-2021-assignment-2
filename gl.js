@@ -24,6 +24,8 @@ var displayShadowmap = false;
 class FBO {
     constructor(size) {
         // TODO: Create FBO and texture with size
+        this.texture = createTexture2D(gl, size, size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
     }
 
     start() {
