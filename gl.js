@@ -23,21 +23,21 @@ var displayShadowmap = false;
 */
 class FBO {
     constructor(size) {
-        // TODO: Create FBO and texture with size
-        this.texture = createTexture2D(gl, this.size, this.size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        // TODO: Create FBO and texture with size -- DONE
+        this.texture = createTexture2D(gl, size, ize, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this.fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
     }
 
     start() {
-        // TODO: Bind FBO, set viewport to size, clear depth buffer
+        // TODO: Bind FBO, set viewport to size, clear depth buffer -- DONE
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
-        gl.viewport(0, 0, size.width, size.height);
+        gl.viewport(0, 0, this.size, this.size);
         gl.clearDepth(1.0);
         gl.clear(gl.DEPTH_BUFFER_BIT);
     }
 
     stop() {
-        // TODO: unbind FBO
+        // TODO: unbind FBO -- DONE
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }
@@ -64,7 +64,8 @@ class ShadowMapProgram {
     }
 
     use() {
-        // TODO: use program
+        // TODO: use program -- DONE
+        gl.useProgram(this.program);
     }
 }
 
@@ -198,37 +199,60 @@ class Layer {
     }
 
     draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, shadowPass = false, texture = null) {
-        // TODO: Handle shadow pass (using ShadowMapProgram) and regular pass (using LayerProgram)
+        // TODO: Handle shadow pass (using ShadowMapProgram) and regular pass (using LayerProgram) -- DONE
         gl.clearColor(1, 1, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
-    
-        updateModelMatrix();
-        updateProjectionMatrix();
-        updateViewMatrix();
+
 
         if(shadowPass){
             //use ShadowMapProgram
+
+            updateModelMatrix();
+            updateProjectionMatrix();
+            updateViewMatrix();
+            updateLightViewMatrix();
+            updateLightProjectionMatrix();
+
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+            gl.useProgram(this.shadowProgram.program);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.uniform1i(this.shadowProgram.samplerLoc, 0);
+
+            gl.uniformMatrix4fv(this.shadowProgram.modelLoc, false, new Float32Array(modelMatrix));
+            gl.uniformMatrix4fv(this.shadowProgram.projectionLoc, false, new Float32Array(projectionMatrix));
+            gl.uniformMatrix4fv(this.shadowProgram.viewLoc, false, new Float32Array(viewMatrix));
+            gl.uniformMatrix4fv(this.shadowProgram.lightViewLoc, false, new Float32Array(lightViewMatrix));
+            gl.uniformMatrix4fv(this.shadowProgram.lightProjectionLoc, false, new Float32Array(lightProjectionMatrix));
+            gl.bindVertexArray(this.vao);
+            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, );
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
         }
         else{
             //use LayerProgram
-        
+            updateModelMatrix();
+            updateProjectionMatrix();
+            updateViewMatrix();
+
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        
-            gl.useProgram(program);
-        
+
+            gl.useProgram(this.layerProgram.program);
+            
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.uniform1i(samplerLoc, 0);
-        
-            gl.uniformMatrix4fv(modelLoc, false, new Float32Array(modelMatrix));
-            gl.uniformMatrix4fv(projLoc, false, new Float32Array(projMatrix));
-            gl.uniformMatrix4fv(viewLoc, false, new Float32Array(viewMatrix));
-            gl.bindVertexArray(vao);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.elements);
+            gl.uniform1i(this.layerProgram.samplerLoc, 0);
+
+            gl.uniformMatrix4fv(this.layerProgram.modelLoc, false, new Float32Array(modelMatrix));
+            gl.uniformMatrix4fv(this.layerProgram.projectionLoc, false, new Float32Array(projectionMatrix));
+            gl.uniformMatrix4fv(this.layerProgram.viewLoc, false, new Float32Array(viewMatrix));
+            gl.bindVertexArray(this.vao);
+            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, );
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-        
-            requestAnimationFrame(draw);
         }
+
+        requestAnimationFrame(draw);
     }
 }
 
@@ -311,7 +335,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // TODO: First rendering pass, rendering using FBO
-
+    fbo = new FBO();
 
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
