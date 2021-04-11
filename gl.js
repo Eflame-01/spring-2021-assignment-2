@@ -24,16 +24,21 @@ var displayShadowmap = false;
 class FBO {
     constructor(size) {
         // TODO: Create FBO and texture with size
-        this.texture = createTexture2D(gl, size, size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
-        fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
+        this.texture = createTexture2D(gl, this.size, this.size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        this.fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
     }
 
     start() {
         // TODO: Bind FBO, set viewport to size, clear depth buffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+        gl.viewport(0, 0, size.width, size.height);
+        gl.clearDepth(1.0);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
     }
 
     stop() {
         // TODO: unbind FBO
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }
 
@@ -194,6 +199,36 @@ class Layer {
 
     draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, shadowPass = false, texture = null) {
         // TODO: Handle shadow pass (using ShadowMapProgram) and regular pass (using LayerProgram)
+        gl.clearColor(1, 1, 1, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    
+        updateModelMatrix();
+        updateProjectionMatrix();
+        updateViewMatrix();
+
+        if(shadowPass){
+            //use ShadowMapProgram
+        }
+        else{
+            //use LayerProgram
+        
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        
+            gl.useProgram(program);
+        
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.uniform1i(samplerLoc, 0);
+        
+            gl.uniformMatrix4fv(modelLoc, false, new Float32Array(modelMatrix));
+            gl.uniformMatrix4fv(projLoc, false, new Float32Array(projMatrix));
+            gl.uniformMatrix4fv(viewLoc, false, new Float32Array(viewMatrix));
+            gl.bindVertexArray(vao);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.elements);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+        
+            requestAnimationFrame(draw);
+        }
     }
 }
 
