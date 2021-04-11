@@ -17,6 +17,13 @@ out vec4 vLightSpacePos;
 
 void main() {
     // TODO: If has normals, compute color considering it
+    if(normal){
+        vColor = 
+    }
+    else{
+        vColor = 
+    }
     // TODO: compute light space position and gl_Position
+    vLightSpacePos = position
 }
 `;
