@@ -24,7 +24,7 @@ var displayShadowmap = false;
 class FBO {
     constructor(size) {
         // TODO: Create FBO and texture with size -- DONE
-        this.texture = createTexture2D(gl, size, ize, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        this.texture = createTexture2D(gl, size, size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this.fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
     }
 
@@ -215,7 +215,7 @@ class Layer {
 
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-            gl.useProgram(this.shadowProgram.program);
+            this.shadowProgram.use();
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -238,8 +238,8 @@ class Layer {
 
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-            gl.useProgram(this.layerProgram.program);
-            
+            this.layerProgram.use();
+
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.uniform1i(this.layerProgram.samplerLoc, 0);
@@ -335,7 +335,6 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // TODO: First rendering pass, rendering using FBO
-    fbo = new FBO();
 
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
