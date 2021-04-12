@@ -298,14 +298,29 @@ function updateModelMatrix(centroid) {
 }
 
 function updateProjectionMatrix() {
-    // TODO: Projection matrix
+    // TODO: Projection matrix -- DONE
     var projectionMatrix = identityMatrix();
+    var aspect = window.innerWidth / window.innerHeight;
+    if(currProj == 'perspective'){
+        projectionMatrix = perspectiveMatrix(45 * Math.PI / 180.0, aspect, 1, 50000);
+    }
+    else{
+        var maxzoom = 5000;
+        var size = maxzoom - (currZoom/100.0) * maxzoom * 0.99;
+        projectionMatrix = orthographicMatrix(-aspect * size, aspect * size, -1 * size, 1 * size, 50000)
+    }
     return projectionMatrix;
 }
 
 function updateViewMatrix(centroid){
     // TODO: View matrix
     var viewMatrix = identityMatrix();
+    var radRotate = currRotate * Math.PI / 180.0;
+    var maxzoom = 50000;
+    var radius = maxzoom - (currZoom / 100.0) * maxzoom * 0.99;
+    var x = radius * Math.cos(radRotate);
+    var y = radius * Math.sin(radRotate);
+    viewMatrix = lookAt(add(centroid, [x, y, radius]), centroid, [0, 0, 1]);
     return viewMatrix;
 }
 
@@ -332,6 +347,7 @@ function draw() {
 
     // TODO: First rendering pass, rendering using FBO
     fbo.start();
+    layers.draw();
 
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
