@@ -18,7 +18,7 @@ out vec4 vLightSpacePos;
 void main() {
     // TODO: If has normals, compute color considering it
     if(uHasNormals){
-        vColor = uColor;
+        vColor = uColor * vec4(normal, 1);
     }
     else{
         vColor = uColor;
