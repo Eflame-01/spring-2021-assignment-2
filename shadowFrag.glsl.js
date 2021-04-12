@@ -20,11 +20,8 @@ void main() {
 
     // TODO: evaluate if point is in shadow or not
     float closestDepth = texture(uSampler, projCoords.xy).r;
-
     float currentDepth = projCoords.z;
     float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
-
-    outColor = vec4((1.0 - shadow) * vColor.rgb)
-    gl_FragColor = vec4(outColor.rgb * vLightSpacePos, outColor.a);
+    outColor = vec4(vColor.rgb*(1.0-shadow),1.0);
 }
 `;
