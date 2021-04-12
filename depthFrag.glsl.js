@@ -11,6 +11,6 @@ void main() {
     // TODO: sample from uSampler and output value
     vec4 color = texture(uSampler, vTexcoord);
     float depth = color.r;
-    outColor = vec4(vec3(depth),1)
+    outColor = vec4(vec3(depth),1);
 }
 `;
