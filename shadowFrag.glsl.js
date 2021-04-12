@@ -21,7 +21,10 @@ void main() {
     // TODO: evaluate if point is in shadow or not
     float closestDepth = texture(uSampler, projCoords.xy).r;
     float currentDepth = projCoords.z;
-    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+    float shadow = 0.0;
+    if(currentDepth > closestDepth){
+        shadow = 1.0;
+    }
     outColor = vec4(vColor.rgb*(1.0-shadow),1.0);
 }
 `;
