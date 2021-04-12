@@ -353,7 +353,7 @@ function draw() {
 
     // TODO: First rendering pass, rendering using FBO
     fbo.start();
-    layers.draw(modelMatrix, lightViewMatrix, lightProjectionMatrix);
+    layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, fbo.texture);
     fbo.stop()
 
     if(!displayShadowmap) {
