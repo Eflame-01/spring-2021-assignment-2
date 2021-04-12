@@ -24,7 +24,8 @@ var displayShadowmap = false;
 class FBO {
     constructor(size) {
         // TODO: Create FBO and texture with size -- DONE
-        this.texture = createTexture2D(gl, size, size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        this.size = size;
+        this.texture = createTexture2D(gl, this.size, this.size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this.fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
     }
 
@@ -206,13 +207,6 @@ class Layer {
 
         if(shadowPass){
             //use ShadowMapProgram
-
-            updateModelMatrix();
-            updateProjectionMatrix();
-            updateViewMatrix();
-            updateLightViewMatrix();
-            updateLightProjectionMatrix();
-
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
             this.shadowProgram.use();
@@ -226,16 +220,13 @@ class Layer {
             gl.uniformMatrix4fv(this.shadowProgram.viewLoc, false, new Float32Array(viewMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.lightViewLoc, false, new Float32Array(lightViewMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.lightProjectionLoc, false, new Float32Array(lightProjectionMatrix));
+            gl.uniformMatrix4fv(this.shadowProgram.lightDirAttribLoc, false, new Float32Array(lightViewMatrix));
             gl.bindVertexArray(this.vao);
-            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, );
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
         }
         else{
             //use LayerProgram
-            updateModelMatrix();
-            updateProjectionMatrix();
-            updateViewMatrix();
-
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
             this.layerProgram.use();
@@ -248,8 +239,8 @@ class Layer {
             gl.uniformMatrix4fv(this.layerProgram.projectionLoc, false, new Float32Array(projectionMatrix));
             gl.uniformMatrix4fv(this.layerProgram.viewLoc, false, new Float32Array(viewMatrix));
             gl.bindVertexArray(this.vao);
-            // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, );
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
         }
 
         requestAnimationFrame(draw);
@@ -335,6 +326,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // TODO: First rendering pass, rendering using FBO
+    fbo.start();
 
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
