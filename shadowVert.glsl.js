@@ -18,7 +18,9 @@ out vec4 vLightSpacePos;
 void main() {
     // TODO: If has normals, compute color considering it
     if(uHasNormals){
-        vColor = uColor * vec4(normal, 1);
+        vec3 lightdir = normalize(vec3(1,0,1));
+        float dotp = max(0.25,dot(lightdir,normal));
+        vColor = vec4(dotp*uColor.rgb,1);
     }
     else{
         vColor = uColor;
