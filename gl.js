@@ -357,11 +357,11 @@ function draw() {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         fbo.start();
-        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, false, fbo.texture);
+        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, fbo.texture);
 
         // TODO: Second rendering pass, render to screen
         fbo.stop();
-        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, null);
+        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, false, null);
     }
     else {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
