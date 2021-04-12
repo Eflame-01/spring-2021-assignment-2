@@ -18,12 +18,12 @@ out vec4 vLightSpacePos;
 void main() {
     // TODO: If has normals, compute color considering it
     if(uHasNormals){
-        vec3 lightdir = normalize(vec3(1,0,1));
+        vec3 lightdir = normalize(uLightDir);
         float dotp = max(0.25,dot(lightdir,normal));
         vColor = vec4(dotp*uColor.rgb,1);
     }
     else{
-        vColor = uColor;
+        vColor = vec4(uColor.rgb, 1);
     }
 
     // TODO: compute light space position and gl_Position
