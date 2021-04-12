@@ -352,16 +352,15 @@ function draw() {
     var lightProjectionMatrix = updateLightProjectionMatrix(layers.centroid);
 
     // TODO: First rendering pass, rendering using FBO
+    fbo.start();
+    layers.draw(modelMatrix, lightViewMatrix, lightProjectionMatrix);
+    fbo.stop()
 
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-        fbo.start();
-        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, fbo.texture);
-
         // TODO: Second rendering pass, render to screen
-        fbo.stop();
-        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, false, null);
+        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, fbo.texture);
     }
     else {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
