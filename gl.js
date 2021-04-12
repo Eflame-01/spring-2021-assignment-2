@@ -18,6 +18,12 @@ var currProj = 'perspective';
 var currResolution = 2048;
 var displayShadowmap = false;
 
+var modelMatrix = null;
+var viewMatrix = null;
+var projectionMatrix = null;
+var lightViewMatrix = null;
+var lightProjectionMatrix = null;
+
 /*
     FBO
 */
@@ -214,12 +220,14 @@ class Layer {
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.uniform1i(this.shadowProgram.samplerLoc, 0);
 
+            gl.uniform4fv(this.shadowProgram.colorAttribLoc, this.color);
+            gl.uniform1i(this.shadowProgram.hasNormalsAttribLoc, this.hasNormals);
             gl.uniformMatrix4fv(this.shadowProgram.modelLoc, false, new Float32Array(modelMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.projectionLoc, false, new Float32Array(projectionMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.viewLoc, false, new Float32Array(viewMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.lightViewLoc, false, new Float32Array(lightViewMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.lightProjectionLoc, false, new Float32Array(lightProjectionMatrix));
-            gl.uniformMatrix4fv(this.shadowProgram.lightDirAttribLoc, false, new Float32Array(lightViewMatrix));
+            gl.uniform3fv(this.shadowProgram.lightDirAttribLoc, currLightDirection);
             gl.bindVertexArray(this.vao);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
             gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
@@ -230,10 +238,7 @@ class Layer {
 
             this.layerProgram.use();
 
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.uniform1i(this.layerProgram.samplerLoc, 0);
-
+            gl.uniform4fv(this.layerProgram.colorAttribLoc, this.color);
             gl.uniformMatrix4fv(this.layerProgram.modelLoc, false, new Float32Array(modelMatrix));
             gl.uniformMatrix4fv(this.layerProgram.projectionLoc, false, new Float32Array(projectionMatrix));
             gl.uniformMatrix4fv(this.layerProgram.viewLoc, false, new Float32Array(viewMatrix));
@@ -241,8 +246,6 @@ class Layer {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
             gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
         }
-
-        requestAnimationFrame(draw);
     }
 }
 
@@ -313,9 +316,9 @@ function updateProjectionMatrix() {
 
 function updateViewMatrix(centroid){
     // TODO: View matrix
-    var viewMatrix = identityMatrix();
+    viewMatrix = identityMatrix();
     var radRotate = currRotate * Math.PI / 180.0;
-    var maxzoom = 50000;
+    var maxzoom = 5000;
     var radius = maxzoom - (currZoom / 100.0) * maxzoom * 0.99;
     var x = radius * Math.cos(radRotate);
     var y = radius * Math.sin(radRotate);
@@ -325,13 +328,20 @@ function updateViewMatrix(centroid){
 
 function updateLightViewMatrix(centroid) {
     // TODO: Light view matrix
-    var lightViewMatrix = identityMatrix();
+    lightViewMatrix = identityMatrix();
+    var radRotate = currRotate * Math.PI / 180.0;
+    var radius = 500;
+    var x = radius * Math.cos(radRotate);
+    var y = radius * Math.sin(radRotate);
+    var position = add(centroid, [x, y, radius]);
+    lightViewMatrix = lookAt(position, centroid, [0, 0, 1]);
+    currLightDirection = normalize(sub(position, centroid));
     return lightViewMatrix;
 }
 
 function updateLightProjectionMatrix() {
     // TODO: Light projection matrix
-    var lightProjectionMatrix = identityMatrix();
+    lightProjectionMatrix = orthographicMatrix(-fbo.size, fbo.size, -fbo.size, fbo.size, -2000, 5000);
     return lightProjectionMatrix;
 }
 
@@ -344,16 +354,16 @@ function draw() {
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    var modelMatrix = updateModelMatrix(layers.centroid);
-    var viewMatrix = updateViewMatrix(layers.centroid);
-    var projectionMatrix = updateProjectionMatrix(identityMatrix());
+    modelMatrix = updateModelMatrix(layers.centroid);
+    viewMatrix = updateViewMatrix(layers.centroid);
+    projectionMatrix = updateProjectionMatrix(identityMatrix());
 
-    var lightViewMatrix = updateLightViewMatrix(identityMatrix());
-    var lightProjectionMatrix = updateLightProjectionMatrix(layers.centroid);
+    lightViewMatrix = updateLightViewMatrix(identityMatrix());
+    lightProjectionMatrix = updateLightProjectionMatrix(layers.centroid);
 
     // TODO: First rendering pass, rendering using FBO
     fbo.start();
-    layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, fbo.texture);
+    layers.draw(modelMatrix, lightViewMatrix, lightProjectionMatrix);
     fbo.stop()
 
     if(!displayShadowmap) {
