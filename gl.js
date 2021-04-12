@@ -252,10 +252,15 @@ class Layer {
 */
 window.updateRotate = function() {
     currRotate = parseInt(document.querySelector("#rotate").value);
+    updateViewMatrix(currRotate);
+    updateModelMatrix(currRotate);
+    updateProjectionMatrix();
 }
 
 window.updateLightRotate = function() {
     currLightRotate = parseInt(document.querySelector("#lightRotate").value);
+    updateLightViewMatrix(currLightRotate);
+    updateLightProjectionMatrix();
 }
 
 window.updateZoom = function() {
