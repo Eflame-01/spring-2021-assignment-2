@@ -33,8 +33,7 @@ class FBO {
         // TODO: Bind FBO, set viewport to size, clear depth buffer -- DONE
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
         gl.viewport(0, 0, this.size, this.size);
-        gl.clearDepth(1.0);
-        gl.clear(gl.DEPTH_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     stop() {
@@ -345,17 +344,29 @@ function draw() {
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    var modelMatrix = updateModelMatrix(layers.centroid);
+    var viewMatrix = updateViewMatrix(layers.centroid);
+    var projectionMatrix = updateProjectionMatrix(identityMatrix());
+
+    var lightViewMatrix = updateLightViewMatrix(identityMatrix());
+    var lightProjectionMatrix = updateLightProjectionMatrix(layers.centroid);
+
     // TODO: First rendering pass, rendering using FBO
-    fbo.start();
-    layers.draw();
 
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        fbo.start();
+        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, false, fbo.texture);
+
         // TODO: Second rendering pass, render to screen
+        fbo.stop();
+        layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, null);
     }
     else {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
         // TODO: Render shadowmap texture computed in first pass
+        renderToScreen.draw(fbo.texture);
     }
 
     requestAnimationFrame(draw);
