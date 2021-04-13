@@ -88,10 +88,20 @@ class RenderToScreenProgram {
         this.samplerLoc = gl.getUniformLocation(this.program, "uSampler");
 
         // TODO: Create quad VBO and VAO
+        this.vert = [-1, -1, 0, 1, -1, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0];
+        this.vertexBuffer = createBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(this.vert));
+        this.vao = createVAO(gl, this.posAttribLoc, this.vertexBuffer);
     }
 
     draw(texture) {
         // TODO: Render quad and display texture
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.useProgram(this.program);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(this.samplerLoc, 0);
+        gl.bindVertexArray(this.vao);
+        gl.drawElements(gl.TRIANGLES, this.vert.length, gl.UNSIGNED_SHORT, 0);
     }
 
 }
@@ -206,10 +216,6 @@ class Layer {
 
     draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, shadowPass = false, texture = null) {
         // TODO: Handle shadow pass (using ShadowMapProgram) and regular pass (using LayerProgram) -- DONE
-        gl.clearColor(1, 1, 1, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
-
         if(shadowPass){
             //use ShadowMapProgram
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -228,9 +234,10 @@ class Layer {
             gl.uniformMatrix4fv(this.shadowProgram.lightViewLoc, false, new Float32Array(lightViewMatrix));
             gl.uniformMatrix4fv(this.shadowProgram.lightProjectionLoc, false, new Float32Array(lightProjectionMatrix));
             gl.uniform3fv(this.shadowProgram.lightDirAttribLoc, currLightDirection);
+
             gl.bindVertexArray(this.vao);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_INT, 0);
         }
         else{
             //use LayerProgram
@@ -242,9 +249,10 @@ class Layer {
             gl.uniformMatrix4fv(this.layerProgram.modelLoc, false, new Float32Array(modelMatrix));
             gl.uniformMatrix4fv(this.layerProgram.projectionLoc, false, new Float32Array(projectionMatrix));
             gl.uniformMatrix4fv(this.layerProgram.viewLoc, false, new Float32Array(viewMatrix));
+
             gl.bindVertexArray(this.vao);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_INT, 0);
         }
     }
 }
