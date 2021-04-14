@@ -34,6 +34,7 @@ void main() {
             }
         }
     }
+    shadow /= 9.0;
     outColor = vec4(vColor.rgb*(1.0-shadow),1.0);
 }
 `;
