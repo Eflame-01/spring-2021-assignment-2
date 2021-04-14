@@ -304,6 +304,7 @@ window.handleFile = function(e) {
     Update transformation matrices
 */
 function updateModelMatrix(centroid) {
+    modelMatrix = identityMatrix();
     return identityMatrix();
 }
 
@@ -317,7 +318,7 @@ function updateProjectionMatrix() {
     else{
         var maxzoom = 5000;
         var size = maxzoom - (currZoom/100.0) * maxzoom * 0.99;
-        projectionMatrix = orthographicMatrix(-aspect * size, aspect * size, -1 * size, 1 * size, currZoom, 50000);
+        projectionMatrix = orthographicMatrix(-aspect * size, aspect * size, -1 * size, 1 * size, -1, 50000);
     }
     return projectionMatrix;
 }
