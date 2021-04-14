@@ -39,7 +39,7 @@ class FBO {
         // TODO: Bind FBO, set viewport to size, clear depth buffer -- DONE
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
         gl.viewport(0, 0, this.size, this.size);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
     }
 
     stop() {
@@ -309,7 +309,7 @@ function updateModelMatrix(centroid) {
 
 function updateProjectionMatrix() {
     // TODO: Projection matrix -- DONE
-    var projectionMatrix = identityMatrix();
+    projectionMatrix = identityMatrix();
     var aspect = window.innerWidth / window.innerHeight;
     if(currProj == 'perspective'){
         projectionMatrix = perspectiveMatrix(45 * Math.PI / 180.0, aspect, 1, 50000);
@@ -323,7 +323,7 @@ function updateProjectionMatrix() {
 }
 
 function updateViewMatrix(centroid){
-    // TODO: View matrix
+    // TODO: View matrix - DONE
     viewMatrix = identityMatrix();
     var radRotate = currRotate * Math.PI / 180.0;
     var maxzoom = 5000;
@@ -335,7 +335,7 @@ function updateViewMatrix(centroid){
 }
 
 function updateLightViewMatrix(centroid) {
-    // TODO: Light view matrix
+    // TODO: Light view matrix - UNSURE
     lightViewMatrix = identityMatrix();
     var radRotate = currRotate * Math.PI / 180.0;
     var radius = 500;
@@ -348,7 +348,7 @@ function updateLightViewMatrix(centroid) {
 }
 
 function updateLightProjectionMatrix() {
-    // TODO: Light projection matrix
+    // TODO: Light projection matrix - UNSURE
     lightProjectionMatrix = orthographicMatrix(-fbo.size, fbo.size, -fbo.size, fbo.size, -2000, 5000);
     return lightProjectionMatrix;
 }
@@ -369,7 +369,7 @@ function draw() {
     lightViewMatrix = updateLightViewMatrix(identityMatrix());
     lightProjectionMatrix = updateLightProjectionMatrix(layers.centroid);
 
-    // TODO: First rendering pass, rendering using FBO
+    // TODO: First rendering pass, rendering using FBO - DONE
     fbo.start();
     layers.draw(modelMatrix, lightViewMatrix, lightProjectionMatrix);
     fbo.stop()
@@ -377,12 +377,12 @@ function draw() {
     if(!displayShadowmap) {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-        // TODO: Second rendering pass, render to screen
+        // TODO: Second rendering pass, render to screen - DONE
         layers.draw(modelMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, true, fbo.texture);
     }
     else {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        // TODO: Render shadowmap texture computed in first pass
+        // TODO: Render shadowmap texture computed in first pass - DONE
         renderToScreen.draw(fbo.texture);
     }
 
