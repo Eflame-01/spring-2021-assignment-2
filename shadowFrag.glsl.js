@@ -10,7 +10,7 @@ out vec4 outColor;
 vec3 shadowCalculation(vec4 lightSpacePos) {
     // TODO: shadow calculation
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-    projCoords = projCoords * 0.05 + 0.05;
+    projCoords = projCoords * 0.5 + 0.5;
     return projCoords;
 }
 
