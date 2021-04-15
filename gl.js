@@ -241,8 +241,6 @@ class Layer {
         }
         else{
             //use LayerProgram
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
             this.layerProgram.use();
 
             gl.uniform4fv(this.layerProgram.colorAttribLoc, this.color);
@@ -338,7 +336,7 @@ function updateViewMatrix(centroid){
 function updateLightViewMatrix(centroid) {
     // TODO: Light view matrix - UNSURE
     lightViewMatrix = identityMatrix();
-    var radRotate = currRotate * Math.PI / 180.0;
+    var radRotate = currLightRotate * Math.PI / 180.0;
     var radius = 500;
     var x = radius * Math.cos(radRotate);
     var y = radius * Math.sin(radRotate);
