@@ -22,11 +22,13 @@ void main() {
     float closestDepth = texture(uSampler, projCoords.xy).r;
     float currentDepth = projCoords.z;
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(projCoords, 0);
-    bias = 0.0025;
+    vec2 texelSize;
+    texelSize.x = 1.0 / float(textureSize(uSampler, 0).x);
+    texelSize.y = 1.0 / float(textureSize(uSampler, 0).y);
+    float bias = 0.0025;
     for(int x = -1; x <= 1; ++x){
         for(int y = -1; y <= 1; ++y){
-            float pcfDepth = texture(projCoords, vLightSpacePos.xy + vec2(x, y) * texelSize).r;
+            float pcfDepth = texture(uSampler, projCoords.xy + vec2(x, y) * texelSize).r;
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }
     }
