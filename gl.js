@@ -31,7 +31,7 @@ class FBO {
     constructor(size) {
         // TODO: Create FBO and texture with size -- DONE
         this.size = size;
-        this.texture = createTexture2D(gl, 4096, 4096, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        this.texture = createTexture2D(gl, this.size, this.size, gl.DEPTH_COMPONENT32F, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this.fbo = createFBO(gl, gl.DEPTH_ATTACHMENT, this.texture);
     }
 
@@ -348,7 +348,7 @@ function updateLightViewMatrix(centroid) {
 
 function updateLightProjectionMatrix() {
     // TODO: Light projection matrix - UNSURE
-    lightProjectionMatrix = orthographicMatrix(-fbo.size, fbo.size, -fbo.size, fbo.size, -2000, 5000);
+    lightProjectionMatrix = orthographicMatrix(-fbo.size * 2, fbo.size * 2, -fbo.size * 2, fbo.size * 2, -2000, 5000);
     return lightProjectionMatrix;
 }
 
